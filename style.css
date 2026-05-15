@@ -1,0 +1,205 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
+    height: 100vh; overflow: hidden; font-family: 'Segoe UI', sans-serif;
+}
+
+/* === HUD E NUVENS === */
+.hud {
+    background: rgba(255,255,255,0.9); padding: 20px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 5px solid #2d6a4f; z-index: 100; position: relative;
+}
+.stats span { margin-left: 25px; font-weight: bold; font-size: 1.2rem; color: #2e7d32; }
+
+.clouds { position: absolute; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.cloud { position: absolute; color: rgba(255,255,255,0.6); font-size: 5rem; left: -150px; animation: moverNuvem linear infinite; }
+@keyframes moverNuvem { to { transform: translateX(120vw); } }
+
+/* === CENÁRIO GERAL === */
+#world-map {
+    display: flex; gap: 350px; 
+    padding: 150px 150px 80px; /* Mais espaço no topo para a árvore não cortar */
+    overflow-x: auto; 
+    height: calc(100vh - 80px);
+    min-height: 850px; /* Força a tela a ter tamanho suficiente */
+    align-items: flex-end; position: relative; z-index: 2;
+}
+
+#continuous-ground { 
+    position: absolute; bottom: 50px; left: 0; width: 4000px; height: 120px; 
+    background: #4e342e; /* Marrom de terra contínua */
+    z-index: 1; border-radius: 10px; 
+}
+
+.mini-biome {
+    position: relative; min-width: 500px; height: 650px;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end; z-index: 3; transition: 0.5s;
+}
+
+.biome-title {
+    position: absolute; top: -50px; font-size: 2rem; background: white; color: #2d6a4f;
+    padding: 10px 30px; border-radius: 50px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); z-index: 50;
+}
+
+/* === BASES DOS BIOMAS (TERRA COM RAÍZES) === */
+.island-base { 
+    width: 600px; height: 180px; border-radius: 50%; 
+    position: absolute; bottom: -60px; z-index: 2; 
+    overflow: hidden; 
+    box-shadow: inset 0 -20px rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.base-terra {
+    background: #5d4037; /* Cor de terra */
+    border-bottom: 25px solid #3e2723;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    padding-bottom: 25px;
+}
+
+/* Textura das Raízes */
+.roots-system {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><path d="M0 0 Q 10 15 20 5 T 40 15 T 60 5 T 80 15 T 100 0" stroke="%233e2723" stroke-width="2" fill="none"/></svg>');
+    background-size: cover; opacity: 0.3; z-index: 1; pointer-events: none;
+}
+
+/* Texto de conscientização */
+.root-text {
+    color: #efebe9; font-size: 0.9rem; text-align: center; width: 80%;
+    line-height: 1.4; font-style: italic; z-index: 5;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+}
+
+/* === ENFEITES DOS BIOMAS === */
+.predio { position: absolute; background: #6c757d; border-radius: 5px 5px 0 0; top: 15px; box-shadow: inset 3px 0 rgba(255,255,255,0.2); z-index: 2;}
+.p1 { width: 45px; height: 80px; left: 80px; }
+.p2 { width: 60px; height: 110px; right: 100px; background: #495057; }
+.p3 { width: 40px; height: 60px; right: 170px; background: #868e96; }
+
+.vitoria-regia { position: absolute; background: #52b788; border-radius: 50%; border: 3px solid #2d6a4f; box-shadow: 0 5px 10px rgba(0,0,0,0.3); z-index: 2;}
+.vitoria-regia::after { content: ''; position: absolute; width: 15%; height: 100%; background: #0077b6; top: -2px; left: 50%; transform: translateX(-50%); border-radius: 2px; }
+.vr1 { width: 90px; height: 35px; top: 15px; left: 60px; }
+.vr2 { width: 60px; height: 22px; top: 35px; left: 190px; }
+.vr3 { width: 110px; height: 40px; top: 20px; right: 70px; transform: rotate(15deg); }
+
+.arbusto-seco { position: absolute; background: #d4a373; border-radius: 50% 50% 0 0; top: 15px; z-index: 2;}
+.a1 { width: 80px; height: 40px; left: 70px; }
+.a2 { width: 50px; height: 25px; left: 140px; top: 30px; background: #faedcd; }
+.a3 { width: 90px; height: 45px; right: 80px; background: #ccd5ae; }
+
+.samambaia { position: absolute; background: #2d6a4f; border-radius: 50% 50% 0 0; top: 15px; box-shadow: inset -5px 0 rgba(0,0,0,0.3); z-index: 2;}
+.s1 { width: 90px; height: 45px; left: 60px; }
+.s2 { width: 120px; height: 60px; right: 50px; background: #40916c; }
+.s3 { width: 60px; height: 30px; right: 160px; top: 30px; background: #081c15; }
+
+/* === ÁRVORES === */
+.tree-wrapper { position: relative; z-index: 10; margin-bottom: 90px; }
+.css-tree { width: 450px; height: 550px; position: relative; transform-origin: bottom center; animation: sway 5s ease-in-out infinite alternate; }
+@keyframes sway { from { transform: rotate(-1deg); } to { transform: rotate(1deg); } }
+
+.trunk { 
+    width: 100px; height: 280px; left: 175px; 
+    background: #6d4c41; position: absolute; bottom: -30px; /* Tronco afundado na terra */
+    border-radius: 15px 15px 0 0; 
+    box-shadow: inset -20px 0 rgba(0,0,0,0.3); z-index: 4;
+}
+#biome-cerrado .trunk { transform: skewX(6deg); background: #5d4037; }
+#biome-floresta .trunk { width: 120px; left: 165px; background: #4e342e; }
+
+.canopy { position: absolute; top: -20px; width: 100%; height: 400px; z-index: 5;}
+.blob { position: absolute; border-radius: 50%; box-shadow: inset -20px -20px rgba(0,0,0,0.15); }
+
+.b1 { width: 220px; height: 220px; top: 0; left: 115px; }
+.b2 { width: 200px; height: 200px; top: 60px; left: 20px; }
+.b3 { width: 200px; height: 200px; top: 60px; left: 230px; }
+.b4 { width: 180px; height: 180px; top: 180px; left: -10px; }
+.b5 { width: 180px; height: 180px; top: 180px; left: 280px; }
+.b6 { width: 220px; height: 220px; top: 160px; left: 60px; }
+.b7 { width: 220px; height: 220px; top: 160px; left: 170px; }
+.b8 { width: 150px; height: 150px; top: 100px; left: 150px; }
+
+#biome-cidade .blob { background: #4caf50; }
+#biome-pantanal .blob { background: #2e7d32; }
+#biome-cerrado .blob { background: #9e9d24; }
+#biome-floresta .blob { background: #1b5e20; }
+
+/* === FOLHAS EM PNG AQUI === */
+.leaf-wrapper {
+    position: absolute; width: 45px; height: 45px; z-index: 20;
+    cursor: pointer; transition: transform 0.2s;
+}
+.leaf-wrapper:hover { transform: scale(1.2); }
+
+.real-leaf {
+    width: 100%; height: 100%;
+    background-image: url('img/folha_verde.png'); /* Sua imagem */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); /* Sombra para dar volume */
+}
+
+/* Folha amarela com efeito de brilho */
+.user-leaf .real-leaf {
+    background-image: url('img/folha_amarela.png'); /* Sua imagem */
+    filter: drop-shadow(0 0 10px #ffd700);
+    animation: pulsarOuro 2s infinite alternate;
+}
+
+@keyframes pulsarOuro { from { filter: drop-shadow(0 0 5px #ffd700); } to { filter: drop-shadow(0 0 15px #ffaa00); } }
+
+/* === MODAIS E BOTÕES === */
+.locked { filter: grayscale(100%) brightness(0.6); pointer-events: none; }
+.hidden { display: none !important; }
+
+.btn-plantar { z-index: 500; position: absolute; bottom: 280px; background: #ffc107; color: #000; padding: 15px 35px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; font-size: 1.2rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); pointer-events: auto; animation: pulse 1s infinite; }
+.btn-plantar:hover { background: #ffca28; transform: scale(1.1); }
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+.modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; justify-content:center; align-items:center; z-index: 1000; }
+.modal-content { background: white; padding: 40px; border-radius: 30px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.modal-icon { font-size: 4rem; color: #4caf50; margin-bottom: 15px; }
+input[type="text"], textarea { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid #ccc; border-radius: 10px; font-size: 1.1rem; resize: none; font-family: inherit; }
+.btn-primario { background: #2e7d32; color: white; padding: 15px 30px; border: none; border-radius: 50px; cursor: pointer; font-size: 1.2rem; font-weight: bold; }
+.btn-primario:hover { background: #1b5e20; }
+/* === FOLHAS EM PNG === */
+.leaf-wrapper {
+    position: absolute; 
+    width: 45px; 
+    height: 45px; 
+    z-index: 20;
+    cursor: pointer; 
+    transition: transform 0.2s;
+    background: transparent !important; /* Garante que o container não tenha fundo */
+}
+
+.leaf-wrapper:hover { transform: scale(1.2); }
+
+.real-leaf {
+    width: 100%; 
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent !important; /* Remove qualquer fundo branco residual */
+}
+
+/* Folha Verde */
+.leaf-wrapper:not(.user-leaf) .real-leaf {
+    background-image: url('img/folha_verde.png');
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
+}
+
+/* Folha Amarela (Usuário) */
+.user-leaf .real-leaf {
+    background-image: url('img/folha_amarela.png');
+    /* O drop-shadow abaixo cria o brilho dourado seguindo o formato da folha */
+    filter: drop-shadow(0 0 8px #ffd700) drop-shadow(0 0 12px #ffaa00);
+    animation: pulsarOuro 2s infinite alternate;
+}
+
+@keyframes pulsarOuro { 
+    from { opacity: 0.9; transform: scale(1); } 
+    to { opacity: 1; transform: scale(1.05); } 
+}
