@@ -1,109 +1,92 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Green Evolution - Biomas Brasileiros</title>
+    <title>The Last Seed - Urban Eco Edition</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="vignette"></div>
+        <div id="light-rays" class="ambient-fx"></div>
+        <div id="toxic-smog" class="ambient-fx hidden"></div>
+        <div id="damage-overlay" class="hidden"></div>
+        <div id="flash-fx" class="hidden"></div>
+
+        <div id="screen-start" class="screen">
+            <div class="title-container">
+                <h1>THE LAST SEED</h1>
+                <p class="subtitle">Consciência Urbana & Sobrevivência</p>
+            </div>
+            <div class="menu-buttons">
+                <button id="btn-main-play" class="btn-action pulse">INICIAR JORNADA</button>
+                <button class="btn-action secondary">SOBRE O PROJETO</button>
+            </div>
+        </div>
+
+        <div id="screen-char-select" class="screen hidden">
+            <h2 class="cinematic-title">ESCOLHA SEU AGENTE</h2>
+            <p class="cinematic-subtitle">Quem irá lutar pelo equilíbrio da cidade?</p>
+            <div class="char-grid" id="char-options"></div>
+            <button id="btn-confirm-char" class="btn-action" disabled>CONFIRMAR</button>
+        </div>
+
+        <div id="screen-bot-select" class="screen hidden">
+            <h2 class="cinematic-title">ESCOLHA OS ADVERSÁRIOS</h2>
+            <p class="cinematic-subtitle">A cidade está cheia de variáveis. Selecione os robôs:</p>
+            <div class="bot-grid" id="bot-options"></div>
+            <button id="btn-start-game" class="btn-action">ENTRAR NO MUNDO</button>
+        </div>
+
+        <div id="decision-modal" class="hidden decision-card">
+            <div class="card-header">
+                <div id="decision-icon"></div>
+                <h2 id="decision-title">SITUAÇÃO URBANA</h2>
+            </div>
+            <div id="decision-visual-context"></div>
+            <p id="decision-desc"></p>
+            <div id="decision-options" class="options-vertical"></div>
+        </div>
+
+        <div id="game-ui" class="hidden">
+            <div id="world-health-ui">
+                <div id="world-title">EQUILÍBRIO DO PLANETA</div>
+                <div class="health-track"><div id="health-bar"></div></div>
+                <div id="world-status-text">Florescendo</div>
+            </div>
+
+            <div id="player-hud" class="ui-box">
+                <div class="hud-header" id="current-player-name">JOGADOR</div>
+                <div class="lives-container" id="player-lives"></div>
+                <div class="hud-status" id="player-status">ESTÁVEL</div>
+            </div>
+
+            <div id="dice-panel" class="ui-box">
+                <div class="panel-header" id="dice-owner-text">AGUARDANDO</div>
+                <div id="dice-render-area">
+                    <div id="physical-dice" class="hidden"><span id="physical-dice-val">1</span></div>
+                </div>
+                <button id="btn-roll-dice" class="btn-action" disabled>ROLAR DADO</button>
+            </div>
+        </div>
+
+        <div id="bot-educational-feed"></div>
+        <div id="cinematic-message" class="hidden">
+            <h1 id="cine-title"></h1>
+            <p id="cine-desc"></p>
+        </div>
+
+        <div id="persistent-end-ui" class="hidden">
+            <div id="final-ranking" class="hidden"></div>
+            <button id="btn-restart-game" class="hidden">RECOMEÇAR</button>
+        </div>
+    </div>
+
+    <img src="img/folha_verde.png" id="img-folha" class="hidden" alt="folha">
     
-    <header class="hud">
-        <h1>The Green Evolution</h1>
-        <div class="stats">
-            <span><i class="fas fa-leaf"></i> Pontos: <span id="total-score">0</span></span>
-            <span><i class="fas fa-seedling"></i> Sementes: <span id="seeds-count">0</span></span>
-        </div>
-    </header>
-
-    <div class="clouds">
-        <div class="cloud" style="top: 5%; animation-duration: 25s;"><i class="fas fa-cloud"></i></div>
-        <div class="cloud" style="top: 15%; animation-duration: 35s;"><i class="fas fa-cloud"></i></div>
-    </div>
-
-    <main id="world-map">
-        <div id="continuous-ground"></div>
-
-        <div class="mini-biome unlocked" id="biome-cidade">
-            <h2 class="biome-title">Centro Urbano</h2>
-            <div class="tree-wrapper"></div>
-            
-            <div class="island-base base-terra">
-                <div class="roots-system"></div>
-                <p class="root-text">Protegendo o <strong>Centro Urbano</strong> vc ajuda a proteger o meio ambiente como um todo, ajude o planeta terra ele precisa de você</p>
-                
-                <div class="predio p1"></div>
-                <div class="predio p2"></div>
-                <div class="predio p3"></div>
-            </div>
-        </div>
-
-        <div class="mini-biome locked" id="biome-pantanal">
-            <h2 class="biome-title">Pantanal</h2>
-            <div class="tree-wrapper"></div>
-            
-            <div class="island-base base-terra">
-                <div class="roots-system"></div>
-                <p class="root-text">Protegendo o <strong>Pantanal</strong> vc ajuda a proteger o meio ambiente como um todo, ajude o planeta terra ele precisa de você</p>
-                
-                <div class="vitoria-regia vr1"></div>
-                <div class="vitoria-regia vr2"></div>
-                <div class="vitoria-regia vr3"></div>
-            </div>
-            <button class="btn-plantar hidden" onclick="abrirModalIdeia(1, 'pantanal')">Plantar no Pantanal</button>
-        </div>
-
-        <div class="mini-biome locked" id="biome-cerrado">
-            <h2 class="biome-title">Cerrado</h2>
-            <div class="tree-wrapper"></div>
-            
-            <div class="island-base base-terra">
-                <div class="roots-system"></div>
-                <p class="root-text">Protegendo o <strong>Cerrado</strong> vc ajuda a proteger o meio ambiente como um todo, ajude o planeta terra ele precisa de você</p>
-                
-                <div class="arbusto-seco a1"></div>
-                <div class="arbusto-seco a2"></div>
-                <div class="arbusto-seco a3"></div>
-            </div>
-            <button class="btn-plantar hidden" onclick="abrirModalIdeia(2, 'cerrado')">Plantar no Cerrado</button>
-        </div>
-
-        <div class="mini-biome locked" id="biome-floresta">
-            <h2 class="biome-title">Amazônia</h2>
-            <div class="tree-wrapper"></div>
-            
-            <div class="island-base base-terra">
-                <div class="roots-system"></div>
-                <p class="root-text">Protegendo a <strong>Amazônia</strong> vc ajuda a proteger o meio ambiente como um todo, ajude o planeta terra ele precisa de você</p>
-                
-                <div class="samambaia s1"></div>
-                <div class="samambaia s2"></div>
-                <div class="samambaia s3"></div>
-            </div>
-            <button class="btn-plantar hidden" onclick="abrirModalIdeia(3, 'floresta')">Plantar na Amazônia</button>
-        </div>
-    </main>
-
-    <div id="modal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-icon"><i class="fas fa-seedling"></i></div>
-            <h2 id="modal-title">Dica Ambiental</h2>
-            <p id="modal-text">...</p>
-            <button id="close-modal" class="btn-primario">Entendi!</button>
-        </div>
-    </div>
-
-    <div id="modal-ideia" class="modal hidden">
-        <div class="modal-content">
-            <h2>Sua vez de contribuir!</h2>
-            <p>Deixe sua dica para esta árvore e assine com seu nome:</p>
-            <input type="text" id="user-name-input" placeholder="Seu Nome ou Apelido">
-            <textarea id="user-idea-input" placeholder="Escreva sua dica aqui..." rows="4"></textarea>
-            <button id="submit-idea-btn" class="btn-primario">Adicionar minha folha à árvore!</button>
-        </div>
-    </div>
-
     <script src="script.js"></script>
 </body>
 </html>
